@@ -88,7 +88,7 @@ taskID threadpool_addTask(threadpool_t *threadpool, task_t *task)
 	pthread_mutex_lock(REF(threadpool->mutex));
 
 	//The return value
-	taskID ID = -1;
+	taskID ID = 0;
 
 	//Add to tasks
 	if(tasklist_insert(threadpool->tasks, task)) {

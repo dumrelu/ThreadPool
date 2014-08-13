@@ -55,7 +55,7 @@ threadpool_t *threadpool_create(
  *
  * input: @threadpool the thread pool, @task the task.
  * output: @return the task id.
- * errors: @return -1 if task no added.
+ * errors: @return 0 if task no added.
  */
 taskID threadpool_addTask(
 	threadpool_t *threadpool,
