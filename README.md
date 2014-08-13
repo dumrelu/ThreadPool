@@ -2,14 +2,15 @@ ThreadPool
 ==========
 
 ##Description
-A simple to use thread pool implemented in C using pthread.
+A simple to use thread pool implemented in C using pthread. The thread pool executes tasks using a number of threads.
 
-##Task components
-The thread pool executes tasks(data structures of type [task_t](https://github.com/dumrelu/ThreadPool/blob/master/src/task/task.h)). The task has **3** major components:
+##The task
+The thread pool executes tasks(data structures of type [task_t](https://github.com/dumrelu/ThreadPool/blob/master/src/task/task.h)). The task has **4** major components:
 
 1. An _argument_.
 2. A _work function_.
 3. A _priority_.
+4. An _ID_.
 
 ###The argument
 The _argument_ is an object of type [argument_t](https://github.com/dumrelu/ThreadPool/blob/master/src/task/task.h) and it's used to send data to the _work function_. It has **3** components:
@@ -56,4 +57,47 @@ The _work function_ definition:
 typedef void (*work_function)(argument_t *);
 ```
 
-You can find a simple example of a work function [here](https://github.com/dumrelu/ThreadPool/blob/master/examples/simple_work_function.c);
+You can find a simple example of a work function [here](https://github.com/dumrelu/ThreadPool/blob/master/examples/simple_work_function.c).
+
+###Priority
+Every task has a priority, **LOW**, **MEDIUM** or **HIGH**. The order in which the tasks are executed by the thread pool is based on the priority.
+
+###ID
+An unique identifier(of type **taskID**, which is a typedef of an int) is assigned to every task when created. You can interact with the thread pool using only the taskID.
+
+
+###Creating and executing a task
+To create a task use the **task_create()** function which takes as parameters a _work function_, an _argument_ and a _priority_. If the task is not added to a thread pool you should free it using the **task_free()** function.
+
+To execute the task call the **task_exec()** function which returns 1 on success and 0 if failed. Note that after a successful call to **task_exec()** the _task->argument.arg_ is freed if _task->argument.del_arg_ == **DELETE**. 
+
+Sample code:
+```c
+//...
+task_t *task = task_create(work, make_argument(...), MEDIUM);
+task_exec(task);
+task_free(task);
+//...
+```
+
+##The thread pool
+To create a thread pool just call the **threadpool_create()** function which takes as a single parameter the number of threads for the thread pool(note that the threads will automatically start).
+```c
+threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
+```
+
+To add a task to the thread pool you can either create a task and add it, or you can let the threadpool create the task for you, this way you'll never need to interact with the task_t structure. Note that both methods will return the inserted task's ID on success and 0 if failed.
+```c
+threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
+
+//Method 1
+task_t *task = task_create(work, make_argument(...), HIGH);
+taskID ID = threadpool_addTask(threadpool, task);
+if(ID)
+      printf("Inserted task %d.\n", ID);
+
+//Method 2
+ID = threadpool_add(threadpool, work, make_argument(...), HIGH);
+if(ID)
+      printf("Inserted task %d.\n", ID);
+```
