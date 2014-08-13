@@ -61,7 +61,8 @@ typedef void (*work_function)(argument_t *);
 typedef enum {
 	LOW,
 	MEDIUM,
-	HIGH
+	HIGH,
+	DEFAULT = MEDIUM
 } priority_t;
 
 //==========================================
