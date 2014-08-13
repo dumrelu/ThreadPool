@@ -126,6 +126,7 @@ printf("All tasks completed.\n");
 
 ######Free the memory
 To free the memory you can choose one of this methods:
+
 1. **threadpool_free()** - Blocking function. It waits for all the tasks in the thread pool to complete and then frees up all the memory used.
 2. **threadpool_freeLater()** - Non-blocking function. It will start a background thread that will free the memory automatically then all the tasks have been executed. Note that by accessing the pointer to the thread pool after a call to this method can result in undefined behaviour, so it's recommended not to.
 
