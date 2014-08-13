@@ -59,6 +59,7 @@ typedef void (*work_function)(argument_t *);
 Below is an example of a simple work function that adds all the elements of an array in a certain range.
 ```c
 #include <stdio.h>
+#include "task/task.h"
 
 typedef struct {
       int start;
