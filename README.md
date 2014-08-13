@@ -44,7 +44,7 @@ argument_t argument = make_argument((void*) data, DELETE, (void*) &result);
 ```
 
 ######When no argument is needed
-When no argument is need the NO_ARGUMENT global variable can be used, which is defined as:
+When no argument is need the **NO_ARGUMENT** global variable can be used, which is defined as:
 ```c
 argument_t NO_ARGUMENT = { NULL, NO_DELETE, NULL };
 ```
@@ -63,7 +63,7 @@ You can find a simple example of a work function [here](https://github.com/dumre
 Every task has a priority, **LOW**, **MEDIUM** or **HIGH**. The order in which the tasks are executed by the thread pool is based on the priority.
 
 ###ID
-An unique identifier(of type **taskID**, which is a typedef of an int) is assigned to every task when created. You can interact with the thread pool using only the taskID.
+An unique identifier(of type **taskID**, which is a typedef of an int type) is assigned to every task when created. You can interact with the thread pool using only the **taskID**.
 
 
 ###Creating and executing a task
@@ -81,12 +81,14 @@ task_free(task);
 ```
 
 ##The thread pool
+######Creating a thread pool
 To create a thread pool just call the **threadpool_create()** function which takes as a single parameter the number of threads for the thread pool(note that the threads will automatically start).
 ```c
 threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
 ```
 
-To add a task to the thread pool you can either create a task and add it, or you can let the threadpool create the task for you, this way you'll never need to interact with the task_t structure. Note that both methods will return the inserted task's ID on success and 0 if failed.
+######Adding a task
+To add a task to the thread pool you can either create a task and add it, or you can let the threadpool create the task for you, this way you'll never need to interact with the task_t structure. Note that both methods will return the inserted task's ID(> 0) on success and 0 if failed.
 ```c
 threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
 
@@ -101,3 +103,48 @@ ID = threadpool_add(threadpool, work, make_argument(...), HIGH);
 if(ID)
       printf("Inserted task %d.\n", ID);
 ```
+
+######Waiting
+You can wait for all the tasks in the thread pool to be completed using the **threadpool_wait()** function, or wait for a certain task(using its ID) with the **threadpool_waitTask()** function.
+```c
+threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
+
+taskID ID = threadpool_add(threadpool, work, make_argument(...), MEDIUM);
+
+//Add some other tasks
+
+//Wait for the task with the taskID ID to finish
+threadpool_waitTask(threadpool, ID);
+printf("Task #%d is done.\n", ID);
+
+//Wait for the other task to complete
+threadpool_wait(threadpool);
+printf("All tasks completed.\n");
+
+//Free memory
+```
+
+######Free the memory
+To free the memory you can choose one of this methods:
+1. **threadpool_free()** - Blocking function. It waits for all the tasks in the thread pool to complete and then frees up all the memory used.
+2. **threadpool_freeLater()** - Non-blocking function. It will start a background thread that will free the memory automatically then all the tasks have been executed. Note that by accessing the pointer to the thread pool after a call to this method can result in undefined behaviour, so it's recommended not to.
+
+Modifying the previous example we get:
+```c
+threadpool_t *threadpool = threadpool_create(5);  //Create a thread pool with 5 threads
+
+taskID ID = threadpool_add(threadpool, work, make_argument(...), MEDIUM);
+
+//Add some other tasks
+
+//Wait for the task with the taskID ID to finish
+threadpool_waitTask(threadpool, ID);
+printf("Task #%d is done.\n", ID);
+
+//Wait for the other task to complete and free memory
+threadpool_free(threadpool);
+printf("All tasks completed and memory freed!\n");
+```
+
+##Examples
+For more examples check out the [examples](https://github.com/dumrelu/ThreadPool/tree/master/examples) folder.
