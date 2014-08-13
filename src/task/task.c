@@ -22,7 +22,7 @@ argument_t make_argument(void *arg, memory_t del_arg, void *result)
 //=====
 
 //The source for the unique id's
-taskID taskIDSource = 0;
+taskID taskIDSource = 1;
 pthread_mutex_t IDSource_lock = PTHREAD_MUTEX_INITIALIZER;	//Provides synchronized access to the taskIDSource
 
 task_t *task_create(work_function work, argument_t argument, priority_t priority)
