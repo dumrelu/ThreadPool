@@ -14,8 +14,8 @@ void addElements(argument_t *argument)
 
       //Add the element in the given range
       int i, result = 0;
-      for(i = range->start; i < range->count; i++)
-            result += range->array[i];
+      for(i = 0; i < range->count; i++)
+            result += range->array[range->start + i];
 
       //Set the result
       *((int*) argument->result) = result;
